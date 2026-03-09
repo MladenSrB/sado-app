@@ -55,7 +55,10 @@ function LabelDropdown({
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     }
@@ -76,7 +79,11 @@ function LabelDropdown({
   let displayCharCount = 0;
   let displayCount = 0;
   for (const label of selectedLabels) {
-    if (displayCharCount + label.name.length > MAX_DISPLAY_CHARS && displayCount > 0) break;
+    if (
+      displayCharCount + label.name.length > MAX_DISPLAY_CHARS &&
+      displayCount > 0
+    )
+      break;
     displayCharCount += label.name.length;
     displayCount++;
   }
@@ -84,7 +91,10 @@ function LabelDropdown({
   const useCompact = displayCount < selectedLabels.length;
 
   return (
-    <div ref={containerRef} className="relative flex items-center gap-2 shrink-0">
+    <div
+      ref={containerRef}
+      className="relative flex items-center gap-2 shrink-0"
+    >
       {selectedLabels.length > 0 && (
         <div className="flex flex-wrap items-center gap-1">
           {displayedLabels.map((label) => (
@@ -146,7 +156,9 @@ function LabelDropdown({
           />
           <div className="max-h-40 overflow-y-auto text-black">
             {selectedIds.length >= maxLabelCount && (
-              <p className="px-2 py-1.5 text-sm text-gray-500">Max {maxLabelCount} labels</p>
+              <p className="px-2 py-1.5 text-sm text-gray-500">
+                Max {maxLabelCount} labels
+              </p>
             )}
             {canCreate && (
               <button
@@ -161,7 +173,9 @@ function LabelDropdown({
                 className="w-full text-left px-2 py-1.5 text-sm text-black hover:bg-gray-100 flex items-center gap-2"
               >
                 <span className="text-black">Create new:</span>
-                <span className="font-medium">&quot;{search.trim().slice(0, MAX_LABEL_LENGTH)}&quot;</span>
+                <span className="font-medium">
+                  &quot;{search.trim().slice(0, MAX_LABEL_LENGTH)}&quot;
+                </span>
               </button>
             )}
             {filteredLabels.map((label) => {
@@ -171,11 +185,15 @@ function LabelDropdown({
                   key={label.id}
                   type="button"
                   onClick={() =>
-                    isSelected ? onRemoveLabel(label.id) : canAddMore && onAddLabel(label)
+                    isSelected
+                      ? onRemoveLabel(label.id)
+                      : canAddMore && onAddLabel(label)
                   }
                   className={cn(
                     "w-full text-left px-2 py-1.5 text-sm text-black flex items-center gap-2",
-                    canAddMore || isSelected ? "hover:bg-gray-100" : "opacity-60 cursor-default"
+                    canAddMore || isSelected
+                      ? "hover:bg-gray-100"
+                      : "opacity-60 cursor-default",
                   )}
                 >
                   <span
@@ -197,7 +215,9 @@ function LabelDropdown({
   );
 }
 
-type PendingDelete = { type: "label"; id: number; name?: string } | { type: "todo"; id: number; text?: string };
+type PendingDelete =
+  | { type: "label"; id: number; name?: string }
+  | { type: "todo"; id: number; text?: string };
 
 function ConfirmModal({
   pending,
@@ -225,7 +245,10 @@ function ConfirmModal({
         className="bg-white dark:bg-gray-800 rounded shadow-lg p-4 max-w-sm w-full mx-4 border border-transparent dark:border-gray-700"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 id="confirm-title" className="font-semibold text-lg mb-2 text-gray-900 dark:text-white">
+        <h2
+          id="confirm-title"
+          className="font-semibold text-lg mb-2 text-gray-900 dark:text-white"
+        >
           Confirm delete
         </h2>
         <p className="text-black dark:text-gray-200 mb-4">{message}</p>
@@ -255,16 +278,22 @@ export default function Home() {
   const [labels, setLabels] = useState<Label[]>([]);
   const [input, setInput] = useState("");
   const [filterLabelIds, setFilterLabelIds] = useState<number[]>([]);
-  const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(
+    null,
+  );
 
   const filteredTodos =
     filterLabelIds.length === 0
       ? todos
-      : todos.filter((t) => filterLabelIds.some((id) => t.labelIds.includes(id)));
+      : todos.filter((t) =>
+          filterLabelIds.some((id) => t.labelIds.includes(id)),
+        );
 
   function toggleFilterLabel(labelId: number) {
     setFilterLabelIds((prev) =>
-      prev.includes(labelId) ? prev.filter((id) => id !== labelId) : [...prev, labelId]
+      prev.includes(labelId)
+        ? prev.filter((id) => id !== labelId)
+        : [...prev, labelId],
     );
   }
 
@@ -284,20 +313,38 @@ export default function Home() {
   }
 
   function addLabelToTodo(todoId: number, label: Label) {
-    setTodos(todos.map((t) => (t.id === todoId && t.labelIds.length < MAX_LABELS_PER_TODO ? { ...t, labelIds: [...t.labelIds, label.id] } : t)));
+    setTodos(
+      todos.map((t) =>
+        t.id === todoId && t.labelIds.length < MAX_LABELS_PER_TODO
+          ? { ...t, labelIds: [...t.labelIds, label.id] }
+          : t,
+      ),
+    );
   }
 
   function removeLabelFromTodo(todoId: number, labelId: number) {
-    setTodos(todos.map((t) => (t.id === todoId ? { ...t, labelIds: t.labelIds.filter((id) => id !== labelId) } : t)));
+    setTodos(
+      todos.map((t) =>
+        t.id === todoId
+          ? { ...t, labelIds: t.labelIds.filter((id) => id !== labelId) }
+          : t,
+      ),
+    );
   }
 
   function createLabel(name: string): Label | null {
     const trimmed = name.trim().slice(0, MAX_LABEL_LENGTH);
     if (!trimmed) return null;
-    const existing = labels.find((l) => l.name.toLowerCase() === trimmed.toLowerCase());
+    const existing = labels.find(
+      (l) => l.name.toLowerCase() === trimmed.toLowerCase(),
+    );
     if (existing) return existing;
     const existingColors = labels.map((l) => l.color);
-    const label: Label = { id: Date.now(), name: trimmed, color: generateRandomColor(existingColors) };
+    const label: Label = {
+      id: Date.now(),
+      name: trimmed,
+      color: generateRandomColor(existingColors),
+    };
     setLabels([...labels, label]);
     return label;
   }
@@ -305,7 +352,10 @@ export default function Home() {
   function deleteLabel(labelId: number) {
     setLabels((prev) => prev.filter((l) => l.id !== labelId));
     setTodos((prev) =>
-      prev.map((t) => ({ ...t, labelIds: t.labelIds.filter((id) => id !== labelId) }))
+      prev.map((t) => ({
+        ...t,
+        labelIds: t.labelIds.filter((id) => id !== labelId),
+      })),
     );
     setFilterLabelIds((prev) => prev.filter((id) => id !== labelId));
   }
@@ -313,9 +363,7 @@ export default function Home() {
   function confirmDelete() {
     if (!pendingDelete) return;
     if (pendingDelete.type === "label") {
-      // BUG (educational): we should delete pendingDelete.id, but we pass the first label's id so the wrong label gets removed. Fix by using pendingDelete.id.
-      const firstLabelId = labels[0]?.id ?? pendingDelete.id;
-      deleteLabel(firstLabelId);
+      deleteLabel(pendingDelete.id);
     } else {
       deleteTodo(pendingDelete.id);
     }
@@ -340,7 +388,10 @@ export default function Home() {
           placeholder="What needs to be done?"
           className="flex-1 px-3 py-2 text-base border border-gray-300"
         />
-        <button onClick={addTodo} className="px-4 py-2 text-base border border-gray-300">
+        <button
+          onClick={addTodo}
+          className="px-4 py-2 text-base border border-gray-300"
+        >
           Add
         </button>
       </div>
@@ -356,7 +407,7 @@ export default function Home() {
                 "text-xs px-2 py-1 rounded border cursor-pointer",
                 filterLabelIds.length === 0
                   ? "bg-gray-800 text-white border-gray-800"
-                  : "bg-white text-black border-gray-300 hover:bg-gray-50"
+                  : "bg-white text-black border-gray-300 hover:bg-gray-50",
               )}
             >
               All
@@ -369,7 +420,7 @@ export default function Home() {
                   role="group"
                   className={cn(
                     "text-xs px-2 py-1 rounded border cursor-pointer inline-flex items-center gap-1",
-                    !active && "border-transparent"
+                    !active && "border-transparent",
                   )}
                   style={
                     active
@@ -401,7 +452,11 @@ export default function Home() {
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setPendingDelete({ type: "label", id: label.id, name: label.name });
+                      setPendingDelete({
+                        type: "label",
+                        id: label.id,
+                        name: label.name,
+                      });
                     }}
                     className="ml-0.5 hover:opacity-70 shrink-0 cursor-pointer"
                     aria-label={`Delete ${label.name}`}
@@ -422,10 +477,7 @@ export default function Home() {
 
       <ul className="list-none p-0 m-0">
         {filteredTodos.map((todo) => (
-          <li
-            key={todo.id}
-            className="py-3 border-b border-gray-100"
-          >
+          <li key={todo.id} className="py-3 border-b border-gray-100">
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -433,7 +485,12 @@ export default function Home() {
                 onChange={() => toggleTodo(todo.id)}
                 className="shrink-0"
               />
-              <span className={cn("flex-1 min-w-0", todo.done && "line-through text-gray-400")}>
+              <span
+                className={cn(
+                  "flex-1 min-w-0",
+                  todo.done && "line-through text-gray-400",
+                )}
+              >
                 {todo.text}
               </span>
               <LabelDropdown
@@ -444,7 +501,13 @@ export default function Home() {
                 onCreateLabel={createLabel}
               />
               <button
-                onClick={() => setPendingDelete({ type: "todo", id: todo.id, text: todo.text })}
+                onClick={() =>
+                  setPendingDelete({
+                    type: "todo",
+                    id: todo.id,
+                    text: todo.text,
+                  })
+                }
                 className="text-xs px-2 py-1 border border-gray-300 shrink-0 cursor-pointer"
               >
                 Delete
