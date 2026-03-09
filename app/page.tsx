@@ -11,12 +11,16 @@ interface Todo {
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [input, setInput] = useState("");
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   function addTodo() {
     const text = input.trim();
     if (!text) return;
     setTodos([...todos, { id: Date.now(), text, done: false }]);
     setInput("");
+    
+    setToastMessage("新增成功！");
+    setTimeout(() => setToastMessage(null), 3000);
   }
 
   function toggleTodo(id: number) {
@@ -51,7 +55,7 @@ export default function Home() {
         {todos.map((todo) => (
           <li
             key={todo.id}
-            className="flex items-center gap-2 py-2 border-b border-gray-100"
+            className="flex items-center gap-2 py-2 border-b border-gray-100 animate-slide-in-right"
           >
             <input
               type="checkbox"
@@ -67,6 +71,12 @@ export default function Home() {
           </li>
         ))}
       </ul>
+
+      {toastMessage && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-3 rounded shadow-lg animate-slide-in-right z-50">
+          {toastMessage}
+        </div>
+      )}
     </main>
   );
 }
